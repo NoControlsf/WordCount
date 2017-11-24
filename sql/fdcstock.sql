@@ -1,3 +1,4 @@
+# 土地交易信息汇总
 DROP TABLE IF EXISTS transactionlist;
 CREATE TABLE transactionlist (
 "交易编号" TEXT,
@@ -22,7 +23,7 @@ PRIMARY KEY ("iid")
 );
 
 
-
+# 宗地明细信息
 DROP TABLE IF EXISTS transactionDetail;
 CREATE TABLE transactionDetail (
 "iid" TEXT NOT NULL,
@@ -56,7 +57,7 @@ CREATE TABLE transactionDetail (
 PRIMARY KEY ("iid")
 );
 
-
+# 土地出让信息
 DROP TABLE IF EXISTS landLeasingList;
 CREATE TABLE landLeasingList (
 "受让方" TEXT,
@@ -66,7 +67,7 @@ CREATE TABLE landLeasingList (
 PRIMARY KEY ("iid")
 );
 
-
+# 土地出让结果
 DROP TABLE IF EXISTS landLeasingDetail;
 CREATE TABLE landLeasingDetail (
 "iid" TEXT NOT NULL,
@@ -86,7 +87,7 @@ CREATE TABLE landLeasingDetail (
 PRIMARY KEY ("iid")
 );
 
-
+# 建设项目选址意见书
 DROP TABLE IF EXISTS buildingNameApprovalList;
 CREATE TABLE buildingNameApprovalList (
 "建设单位" TEXT,
@@ -96,7 +97,7 @@ CREATE TABLE buildingNameApprovalList (
 "id" TEXT  NOT NULL,
 PRIMARY KEY ("id")
 );
-
+# 建设单位项目办理详细信息
 DROP TABLE IF EXISTS buildingDetail;
 CREATE TABLE buildingDetail (
 "id" TEXT  NOT NULL,
@@ -107,4 +108,29 @@ CREATE TABLE buildingDetail (
 "立案号" TEXT,
 "项目办理状态" TEXT,
 PRIMARY KEY ("id")
+);
+
+
+#建筑名称核准
+DROP TABLE IF EXISTS buildingNameCheckList;
+CREATE TABLE buildingNameCheckList (
+"申报单位" TEXT,
+"核准名称" TEXT,
+"详细地址" TEXT,
+"审批文号" TEXT,
+"bid" TEXT  NOT NULL,
+PRIMARY KEY ("bid")
+);
+
+# 建筑名称核准详细信息
+DROP TABLE IF EXISTS buildingNameCheckDetail;
+CREATE TABLE buildingNameCheckDetail (
+"bid" TEXT  NOT NULL,
+"申报单位" TEXT,
+"建设地区" TEXT,
+"详细地址" TEXT,
+"核准名称" TEXT,
+"审批文号" TEXT,
+"核发日期" TEXT,
+PRIMARY KEY ("bid")
 );
