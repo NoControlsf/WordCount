@@ -45,9 +45,9 @@ def building_name_approval():
                     td_list2.pop()
                     td_list2.append(numb)
             print(td_list2)
-            # 建设单位 项目名称 发文号 立案号 id
             sql = 'replace into buildingNameApprovalList values({})'.format(('?,' * len(td_list2))[:-1])
             conn = sqlite.connect("E:/stock/fdcstock.db")
+            # 建设单位 项目名称 发文号 立案号 id
             cur = conn.cursor()
             cur.execute(sql, td_list2)
             conn.commit()
