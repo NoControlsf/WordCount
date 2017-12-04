@@ -172,7 +172,7 @@ def transaction_detail(count):
             doc = zlib.decompress(u.read(), -zlib.MAX_WBITS)
         if info['Content-Type'] == 'application/octet-stream':
             open('E:\stock\FDCFile\{}'.format(str(count)+'.'+fileType), mode='wb').write(doc)
-            content_list.append('E:\stock\FDCFile\{}'.format(str(count)+'.'+fileType))  # 下载文档路径
+            content_list.append('E:\stock\FDCFile\{}'.format(str(count)+'.'+fileType))  # 下载文档路径 E:\stock\FDCFile\
         else:
             content_list.append('')  # 下载文档路径
             # raise Exception('Unknown Content-Type:' + info['Content-Type'])

@@ -1,8 +1,8 @@
 import re
 import sqlite3 as sqlite
-import urllib
+
 import requests
-import zlib
+
 from bs4 import BeautifulSoup
 
 import socket
