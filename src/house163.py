@@ -13,7 +13,7 @@ def  judgeDate():
     }
     wb_data = requests.get(URL, headers=headers)
     soup = BeautifulSoup(wb_data.text, 'lxml')
-    # print(soup)
+    print(soup)
     span = soup.find('span', class_='time')  #获取整个标签
     # print(span)
     spanTime = span.get_text()  #获取标签中的内容文本
@@ -33,8 +33,10 @@ def  judgeDate():
             print(dateResult)
             if dateResult != spanTime:
                 Daily_real_estate()
+                print('ok')
     else:
         Daily_real_estate()
+        print('ok')
 
 # 获取列表信息
 def getMessage(soup, spanTime):
