@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import re
 import time
 import sqlite3 as sqlite
+import pymysql
 
 # 沪深A股
 def HS_A_Shares():
@@ -30,18 +31,59 @@ def HS_A_Shares():
                     fList.append('')  # 如果为横线则为空
                 else:
                     fList.append(tmp)
-            today = time.strftime('%Y-%m-%d', time.localtime(time.time()))  # 获取当天的时间
+            today = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))  # 获取当天的时间
             fList.append(today)
             if fList[14] != '':
                 fList[14] += '%'
+            # 处理数字为空
+            if fList[2] == '':
+                fList[2] = '0'
+            if fList[3] == '':
+                fList[3] = '0'
+            if fList[5] == '':
+                fList[5] = '0'
+            if fList[6] == '':
+                fList[6] = '0'
+            if fList[7] == '':
+                fList[7] = '0'
+            if fList[8] == '':
+                fList[8] = '0'
+            if fList[9] == '':
+                fList[9] = '0'
+            if fList[10] == '':
+                fList[10] = '0'
+            if fList[11] == '':
+                fList[11] = '0'
+            if fList[13] == '':
+                fList[13] = '0'
+            if fList[15] == '':
+                fList[15] = '0'
             # 股票代码 名称 最新价 涨跌额 涨跌幅 振幅 成交量（手） 成交额 昨收 今开 最高 最低 5分钟涨跌 量比 换手 市盈率（动）日期
             print(fList)
-            sql = 'replace into HSSharesA values({})'.format(('?,' * len(fList))[:-1])
-            conn = sqlite.connect("E:/stock/Shares.db")
+            # mysql
+            conn = pymysql.connect(
+                host='localhost',
+                port=3306,
+                user='root',
+                passwd='',
+                db='shares',
+                charset='utf8mb4',
+                cursorclass=pymysql.cursors.DictCursor
+            )
             cur = conn.cursor()
-            cur.execute(sql, fList)
+            sql = 'insert into HSAShares values({})'.format(('\"%s\",' * len(fList))[:-1])
+            # print(sql)
+            cur.execute(sql % tuple(fList))
+            cur.close()
             conn.commit()
             conn.close()
+            # sqlite
+            # sql = 'replace into HSSharesA values({})'.format(('?,' * len(fList))[:-1])
+            # conn = sqlite.connect("E:/stock/Shares.db")
+            # cur = conn.cursor()
+            # cur.execute(sql, fList)
+            # conn.commit()
+            # conn.close()
 
 
 # 港股
@@ -65,14 +107,49 @@ def HK_Shares():
                     fList.append('')  # 如果为横线则为空
                 else:
                     fList.append(tmp)
+            # 处理数字为空
+            if fList[2] == '':
+                fList[2] = '0'
+            if fList[3] == '':
+                fList[3] = '0'
+            if fList[5] == '':
+                fList[5] = '0'
+            if fList[6] == '':
+                fList[6] = '0'
+            if fList[7] == '':
+                fList[7] = '0'
+            if fList[8] == '':
+                fList[8] = '0'
+            if fList[9] == '':
+                fList[9] = '0'
+            if fList[10] == '':
+                fList[10] = '0'
             print(fList)
             # 股票代码 名称 最新价 涨跌额 涨跌幅 成交量(股) 成交额(港元) 今开 最高 最低 昨收 时间
-            sql = 'replace into HKShares values({})'.format(('?,' * len(fList))[:-1])
-            conn = sqlite.connect("E:/stock/Shares.db")
+            # mysql
+            conn = pymysql.connect(
+                host='localhost',
+                port=3306,
+                user='root',
+                passwd='',
+                db='shares',
+                charset='utf8mb4',
+                cursorclass=pymysql.cursors.DictCursor
+            )
             cur = conn.cursor()
-            cur.execute(sql, fList)
+            sql = 'insert into HKShares values({})'.format(('\"%s\",' * len(fList))[:-1])
+            # print(sql)
+            cur.execute(sql % tuple(fList))
+            cur.close()
             conn.commit()
             conn.close()
+            # sqlite
+            # sql = 'replace into HKShares values({})'.format(('?,' * len(fList))[:-1])
+            # conn = sqlite.connect("E:/stock/Shares.db")
+            # cur = conn.cursor()
+            # cur.execute(sql, fList)
+            # conn.commit()
+            # conn.close()
 
 # 美股
 def US_Shares():
@@ -108,16 +185,66 @@ def US_Shares():
                 fList.append('')  # 如果为横线则为空
             else:
                 fList.append(tmp)
+        # 处理数字为空
+        if fList[2] == '':
+            fList[2] = '0'
+        if fList[3] == '':
+            fList[3] = '0'
+        if fList[4] == '':
+            fList[4] = '0'
+        if fList[5] == '':
+            fList[5] = '0'
+        if fList[8] == '':
+            fList[8] = '0'
+        if fList[9] == '':
+            fList[9] = '0'
+        if fList[10] == '':
+            fList[10] = '0'
+        if fList[11] == '':
+            fList[11] = '0'
+        if fList[12] == '':
+            fList[12] = '0'
+        if fList[13] == '':
+            fList[13] = '0'
+        if fList[14] == '':
+            fList[14] = '0'
+        if fList[15] == '':
+            fList[15] = '0'
+        if fList[16] == '':
+            fList[16] = '0'
+        if fList[17] == '':
+            fList[17] = '0'
+        if fList[19] == '':
+            fList[19] = '0'
+        if fList[20] == '':
+            fList[20] = '0'
         print(fList)
         # （美股的报价单位全部按美元） 简称 名称 今开 昨收 最新价 涨跌额 涨跌幅 换手率 最高价 最低价 成交量 成交额 外盘 内盘 总股本 总市值 市净率 收益(动) 时间 每股净资产 均价
-        sql = 'replace into USShares values({})'.format(('?,' * len(fList))[:-1])
-        conn = sqlite.connect("E:/stock/Shares.db")
+        # mysql
+        conn = pymysql.connect(
+            host='localhost',
+            port=3306,
+            user='root',
+            passwd='',
+            db='shares',
+            charset='utf8mb4',
+            cursorclass=pymysql.cursors.DictCursor
+        )
         cur = conn.cursor()
-        cur.execute(sql, fList)
+        sql = 'insert into USShares values({})'.format(('\"%s\",' * len(fList))[:-1])
+        # print(sql)
+        cur.execute(sql % tuple(fList))
+        cur.close()
         conn.commit()
         conn.close()
+        # sql = 'replace into USShares values({})'.format(('?,' * len(fList))[:-1])
+        # conn = sqlite.connect("E:/stock/Shares.db")
+        # cur = conn.cursor()
+        # cur.execute(sql, fList)
+        # conn.commit()
+        # conn.close()
 
 if __name__ == '__main__':
-    HS_A_Shares()  # 沪深A股
+    # HS_A_Shares()  # 沪深A股
     HK_Shares()  # 港股
     US_Shares()  # 美股

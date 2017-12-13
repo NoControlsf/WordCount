@@ -16,7 +16,7 @@ def  judgeDate():
     print(soup)
     span = soup.find('span', class_='time')  #获取整个标签
     # print(span)
-    spanTime = span.get_text()  #获取标签中的内容文本
+    spanTime = span.get_text().strip()  #获取标签中的内容文本
     print(spanTime)
     # 查询数据库中的数据日期，如果已经存在不爬取
     db = sqlite.connect('e:/stock/fdcstock.db')
@@ -85,7 +85,7 @@ def Daily_real_estate():
         # print(soup)
         span = soup.find('span', class_='time')  #获取整个标签
         # print(span)
-        spanTime = span.get_text()  #获取标签中的内容文本
+        spanTime = span.get_text().strip()  #获取标签中的内容文本
         print(spanTime)
         getMessage(soup, spanTime)
 
