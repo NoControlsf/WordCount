@@ -245,6 +245,6 @@ def US_Shares():
         # conn.close()
 
 if __name__ == '__main__':
-    # HS_A_Shares()  # 沪深A股
+    HS_A_Shares()  # 沪深A股
     HK_Shares()  # 港股
     US_Shares()  # 美股
