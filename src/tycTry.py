@@ -48,22 +48,23 @@ logger = src.util.loginit.get_logger('tyc2')
 
 def get_login():
     url = 'https://www.tianyancha.com/cd/login.json'
-
+    """
     login_json = {'mobile': '13606181270',
                   'cdpassword': 'de2acaac3f5037d6acfba46454cbca87',
                   'loginway': 'PL',
                   'autoLogin': True}
     """
     login_json = {'mobile': '18361296750',
-                  'cdpassword': 'sf123456',
+                  'cdpassword': 'q3hqyVKvuwiL2TRvA4v6Xg==',
                   'loginway': 'PL',
                   'autoLogin': True}
-    """
+
 
     resp = SESS.post(url, json=login_json)
     logger.info('get login')
     resp.raise_for_status()
     data = resp.json()
+    print(data['state'])
     if data['state'] == 'ok':
         SESS.cookies.set('auth_token', data['data']['token'])
         SESS.cookies.set('tyc-user-info', util.js.encodeURIComponent(data['data']))
@@ -101,6 +102,7 @@ def pgf_table(datainfo, div_head):
         datainfo.formatcolumn()
     for tr in tb.tbody.find_all('tr'):
         tds = list(tr.find_all('td'))
+        # print(tds)
         item = {}
         for i in range(len(datainfo.colnames)):
             key = datainfo.colnames[i]
@@ -131,16 +133,25 @@ def cdf_text(element, cdf=None):
 
 
 # 字段分析 ColumnDefineFunction “详情”
+"""
 def cdf_more(element):
     span = element.find('span', class_='companyinfo_show_more_btn')
     if span and span.has_attr('onclick'):
         jsonstr = re.findall('\w+\((.+)\)', span['onclick'])
         if jsonstr and len(jsonstr):
             try:
+                # pattern = re.compile('"(.*)"')
+                # print(pattern.findall(jsonstr[0]))
                 return json.loads(jsonstr[0])
             except:
                 pass
     return ''
+"""
+def cdf_more(element):
+    span = element.find('script')
+    print(span.get_text())
+    return json.loads(span.get_text())
+
 
 
 # 字段分析 ColumnDefineFunction 对外投资企业的年报信息
@@ -194,12 +205,11 @@ def get_base(soup):
     base[tdList[9]] = tdList[10]
     base[tdList[11]] = tdList[12]
     base[tdList[13]] = re_h.sub('', str(tdList[14]))  # 去掉HTML 标签
-    base[tdList[15]] = tdList[16]
+    base[tdList[15]] = re_h.sub('', str(tdList[16]))  # 去掉HTML 标签
     base[tdList[17]] = tdList[18]
     base[tdList[19]] = tdList[20]
     base[tdList[21]] = tdList[22]
     base[tdList[23]] = re_h.sub('', str(tdList[24]))  # 去掉HTML 标签
-
     return base
 
 
@@ -639,10 +649,10 @@ if __name__ == '__main__':
     # 海澜集团有限公司    913202811422746807
     # 江苏新长江国际贸易有限公司 (特殊 江苏新长江实业集团有限公司）clear
     # 深圳市中航永邦并购基金企业（有限合伙）(特殊 江苏阳光集团有限公司) clear
-    companys = ['上海希卓药业有限公司']
+    companys = ['江阴澄星实业集团有限公司']
     for n in companys:
     #    save_company('', n, 'e:/tyc2/北京西城区/' + n + '.json')
-        save_company('', n, 'e:/tyc2/北京西城区/北京智博高科生物技术有限公司/' + n + '/')
+        save_company('', n, 'e:/tyc2/' + n + '/')
         time.sleep(10)
 
 
