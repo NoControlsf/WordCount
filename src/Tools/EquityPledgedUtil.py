@@ -8,9 +8,9 @@ def eachFilePath(root):
             # print(os.path.join(dirpath, filepath))
             str = os.path.join(dirpath, filepath)
             # if(str.endswith('股权出质.json')):
-            if(str.endswith('动产抵押.json')):
-                print(str)
-                print("###########")
+            if(str.endswith('招投标.json')):
+                # print(str)
+                # print("###########")
                 openFile(str)
 
 
@@ -18,6 +18,7 @@ def openFile(filepath):
     if os.path.getsize(filepath):
         with open(filepath, 'r', encoding='utf8') as load_f:
             load_dict = json.load(load_f)
+            print(filepath)
             print(load_dict)
             # for i in range(len(load_dict)):
                 # print(load_dict[i]['操作'])

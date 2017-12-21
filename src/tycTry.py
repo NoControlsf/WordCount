@@ -48,17 +48,17 @@ logger = src.util.loginit.get_logger('tyc2')
 
 def get_login():
     url = 'https://www.tianyancha.com/cd/login.json'
-    """
+
     login_json = {'mobile': '13606181270',
                   'cdpassword': 'de2acaac3f5037d6acfba46454cbca87',
                   'loginway': 'PL',
                   'autoLogin': True}
     """
     login_json = {'mobile': '18361296750',
-                  'cdpassword': 'q3hqyVKvuwiL2TRvA4v6Xg==',
+                  'cdpassword': '8dd8734a6c52f4303dd36cc61e11b6fc',
                   'loginway': 'PL',
                   'autoLogin': True}
-
+    """
 
     resp = SESS.post(url, json=login_json)
     logger.info('get login')
@@ -149,7 +149,7 @@ def cdf_more(element):
 """
 def cdf_more(element):
     span = element.find('script')
-    print(span.get_text())
+    # print(span.get_text())
     return json.loads(span.get_text())
 
 
@@ -163,6 +163,21 @@ def cdf_invest(element):
         return TYC2(compna, compid).get_company([DataInfo_Report])
     else:
         return element.get_text(strip=True)
+
+
+# AnnouncementOfWinningTheBid 中标公告
+def wtb_announcement(element):
+    a = element.find('a')
+    url = 'https://www.tianyancha.com%s' % a['href']
+    # print(url)
+    wb_data = SESS.get(url, params=None, timeout=60)
+    soup = BeautifulSoup(wb_data.text, 'lxml')
+    div = soup.find('div', class_='common-remark-style')
+    link = div.find('a')
+    link_h = link['href']
+    title = a.get_text()
+    dic = {'标题': title, '原始链接': link_h}
+    return dic
 
 
 def get_base(soup):
@@ -366,13 +381,13 @@ TYC_DATALIST = [
     DataInfo('经营异常', 'abnormal'),
     DataInfo('行政处罚', 'punish', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
     # 严重违法缺
-    DataInfo('股权出质', 'equity'),
+    DataInfo('股权出质', 'equity', cdfdict={'操作': cdf_more}, coldict={-1: '操作'}),
     DataInfo('动产抵押', 'mortgage', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
     DataInfo('欠税公告', 'towntax'),
     # 司法拍卖缺
 
     # 经营状况
-    DataInfo('招投标', 'bid'),
+    DataInfo('招投标', 'bid', cdfdict={'中标公告': wtb_announcement}, coldict={1: '中标公告'}),
     DataInfo('债券信息', 'bond', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
     DataInfo('购地信息', 'purchaseland', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
     DataInfo('招聘信息', 'recruit', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
@@ -649,7 +664,7 @@ if __name__ == '__main__':
     # 海澜集团有限公司    913202811422746807
     # 江苏新长江国际贸易有限公司 (特殊 江苏新长江实业集团有限公司）clear
     # 深圳市中航永邦并购基金企业（有限合伙）(特殊 江苏阳光集团有限公司) clear
-    companys = ['江阴澄星实业集团有限公司']
+    companys = ['圣凯诺服饰有限公司']
     for n in companys:
     #    save_company('', n, 'e:/tyc2/北京西城区/' + n + '.json')
         save_company('', n, 'e:/tyc2/' + n + '/')
