@@ -1,23 +1,13 @@
-2017-12-21 15:04:13,377 tyc2 MainThread I get login
-2017-12-21 15:04:22,515 tyc2 MainThread I 圣凯诺服饰有限公司 主要人员 3
-2017-12-21 15:04:22,614 tyc2 MainThread I 圣凯诺服饰有限公司 股东信息 1
-2017-12-21 15:04:22,722 tyc2 MainThread I 圣凯诺服饰有限公司 对外投资 2
-2017-12-21 15:04:23,554 tyc2 MainThread I 圣凯诺服饰有限公司 变更记录 12
-2017-12-21 15:04:25,990 tyc2 MainThread I 圣凯诺服饰有限公司 法律诉讼 5
-2017-12-21 15:04:26,221 tyc2 MainThread I 圣凯诺服饰有限公司 法院公告 3
-2017-12-21 15:05:01,783 tyc2 MainThread I 圣凯诺服饰有限公司 招投标 67
-2017-12-21 15:05:05,587 tyc2 MainThread I 圣凯诺服饰有限公司 招聘信息 48
-2017-12-21 15:05:07,061 tyc2 MainThread I 圣凯诺服饰有限公司 商标信息 5
-2017-12-21 15:05:26,481 tyc2 MainThread I 圣凯诺服饰有限公司 专利信息 162
-2017-12-21 15:05:28,881 tyc2 MainThread I  id OK 
-2017-12-21 15:05:28,888 tyc2 MainThread I  基本信息 OK 
-2017-12-21 15:05:28,897 tyc2 MainThread I  主要人员 OK 
-2017-12-21 15:05:28,902 tyc2 MainThread I  股东信息 OK 
-2017-12-21 15:05:28,910 tyc2 MainThread I  对外投资 OK 
-2017-12-21 15:05:28,932 tyc2 MainThread I  变更记录 OK 
-2017-12-21 15:05:28,947 tyc2 MainThread I  法律诉讼 OK 
-2017-12-21 15:05:28,978 tyc2 MainThread I  法院公告 OK 
-2017-12-21 15:05:29,118 tyc2 MainThread I  招投标 OK 
-2017-12-21 15:05:29,368 tyc2 MainThread I  招聘信息 OK 
-2017-12-21 15:05:29,376 tyc2 MainThread I  商标信息 OK 
-2017-12-21 15:05:30,149 tyc2 MainThread I  专利信息 OK 
+2018-01-03 16:25:42,137 tyc2 MainThread I get login
+2018-01-03 16:25:51,239 tyc2 MainThread I 北京华赛大有投资基金（有限合伙） 股东信息 17
+2018-01-03 16:25:51,401 tyc2 MainThread I 北京华赛大有投资基金（有限合伙） 对外投资 1
+2018-01-03 16:25:55,889 tyc2 MainThread I 北京华赛大有投资基金（有限合伙） 变更记录 31
+2018-01-03 16:26:02,484 tyc2 MainThread I 北京华赛大有投资基金（有限合伙） 企业年报 4
+2018-01-03 16:26:08,069 tyc2 MainThread I 北京华赛大有投资基金（有限合伙） 抽查检查 1
+2018-01-03 16:26:11,390 tyc2 MainThread I  id OK 
+2018-01-03 16:26:11,395 tyc2 MainThread I  基本信息 OK 
+2018-01-03 16:26:11,411 tyc2 MainThread I  股东信息 OK 
+2018-01-03 16:26:11,420 tyc2 MainThread I  对外投资 OK 
+2018-01-03 16:26:11,468 tyc2 MainThread I  变更记录 OK 
+2018-01-03 16:26:11,492 tyc2 MainThread I  企业年报 OK 
+2018-01-03 16:26:11,495 tyc2 MainThread I  抽查检查 OK 

@@ -127,6 +127,7 @@ def HK_Shares():
             print(fList)
             # 股票代码 名称 最新价 涨跌额 涨跌幅 成交量(股) 成交额(港元) 今开 最高 最低 昨收 时间
             # mysql
+            """
             conn = pymysql.connect(
                 host='localhost',
                 port=3306,
@@ -143,6 +144,7 @@ def HK_Shares():
             cur.close()
             conn.commit()
             conn.close()
+            """
             # sqlite
             # sql = 'replace into HKShares values({})'.format(('?,' * len(fList))[:-1])
             # conn = sqlite.connect("E:/stock/Shares.db")
@@ -245,6 +247,6 @@ def US_Shares():
         # conn.close()
 
 if __name__ == '__main__':
-    HS_A_Shares()  # 沪深A股
+    # HS_A_Shares()  # 沪深A股
     HK_Shares()  # 港股
-    US_Shares()  # 美股
+    # US_Shares()  # 美股

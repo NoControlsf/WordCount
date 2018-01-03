@@ -185,10 +185,14 @@ def get_base(soup):
     div = soup.find('div', class_='company_header_width')
 
     base['名称'] = div.div.span.get_text(strip=True)
-    div_row = list(div.div.find_all('div', class_='sec-c2', recursive=False))
-    div_col = list(div_row[0].find_all('div'))
-    base['电话'] = list(div_col[0].find_all('span'))[1].get_text(strip=True)
-    base['邮箱'] = list(div_col[1].find_all('span'))[1].get_text(strip=True)
+
+    div_row = list(div.find_all('div', recursive=False))
+
+    div_col = list(div_row[1].find_all('div'))
+    base['电话'] = list(div_col[1].find_all('span'))[1].get_text(strip=True)
+
+    base['邮箱'] = list(div_col[2].find_all('span'))[1].get_text(strip=True)
+
     div_col = list(div_row[1].find_all('div'))
     web = div_col[0].find('a')
     base['网址'] = web.get_text(strip=True) if web else ''
@@ -225,6 +229,7 @@ def get_base(soup):
     base[tdList[19]] = tdList[20]
     base[tdList[21]] = tdList[22]
     base[tdList[23]] = re_h.sub('', str(tdList[24]))  # 去掉HTML 标签
+
     return base
 
 
@@ -460,7 +465,7 @@ class TYC2:
     def get_report_detail(self, href):
         report = {}
         soup = self.get_soup(TYC_HOST + href)
-
+        # print(soup)
         div_body = soup.find('div', class_='report_body')
         div_content = list(div_body.find_all('div', recursive=False))[1]
         for div in list(div_content.find_all('div', class_=True)):
@@ -497,9 +502,9 @@ class TYC2:
     def get_report(self, div_head):
         report = []
         if div_head:
-            for rpt in div_head.find_all('div', class_='report_item_2017'):
+            for rpt in div_head.find_all('a', class_='report_item_2017'):
                 year = rpt.get_text(strip=True)
-                href = rpt.find('a')['href']
+                href = rpt['href']
                 d = self.get_report_detail(href)
                 if d:
                     d['年度'] = year
@@ -664,10 +669,10 @@ if __name__ == '__main__':
     # 海澜集团有限公司    913202811422746807
     # 江苏新长江国际贸易有限公司 (特殊 江苏新长江实业集团有限公司）clear
     # 深圳市中航永邦并购基金企业（有限合伙）(特殊 江苏阳光集团有限公司) clear
-    companys = ['圣凯诺服饰有限公司']
+    companys = ['北京华赛大有投资基金（有限合伙）']
     for n in companys:
     #    save_company('', n, 'e:/tyc2/北京西城区/' + n + '.json')
-        save_company('', n, 'e:/tyc2/' + n + '/')
+        save_company('', n, 'f:/tyc/' + n + '/')
         time.sleep(10)
 
 
