@@ -9,6 +9,8 @@ import multiprocessing.dummy as mt
 import os
 import re
 import time
+
+import pymysql
 import requests
 
 import util.excel
@@ -20,7 +22,7 @@ from bs4 import BeautifulSoup
 from util.wraps import retry
 
 import src.util.loginit
-
+import os.path
 AGENT_FIREFOX = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0'
 # AGENT_Android7 = 'Mozilla/5.0 (Linux; U; Android 7.0; zh-cn;)'
 TYC_HOST = 'https://www.tianyancha.com'
@@ -48,7 +50,7 @@ logger = src.util.loginit.get_logger('tyc2')
 
 def get_login():
     url = 'https://www.tianyancha.com/cd/login.json'
-
+    """
     login_json = {'mobile': '13606181270',
                   'cdpassword': 'de2acaac3f5037d6acfba46454cbca87',
                   'loginway': 'PL',
@@ -58,7 +60,7 @@ def get_login():
                   'cdpassword': '8dd8734a6c52f4303dd36cc61e11b6fc',
                   'loginway': 'PL',
                   'autoLogin': True}
-    """
+
 
     resp = SESS.post(url, json=login_json)
     logger.info('get login')
@@ -152,8 +154,7 @@ def cdf_more(element):
     # print(span.get_text())
     return json.loads(span.get_text())
 
-
-
+    
 # 字段分析 ColumnDefineFunction 对外投资企业的年报信息
 def cdf_invest(element):
     a = element.find('a')
@@ -182,6 +183,7 @@ def wtb_announcement(element):
 
 def get_base(soup):
     base = {}
+
     div = soup.find('div', class_='company_header_width')
 
     base['名称'] = div.div.span.get_text(strip=True)
@@ -189,14 +191,18 @@ def get_base(soup):
     div_row = list(div.find_all('div', recursive=False))
 
     div_col = list(div_row[1].find_all('div'))
+
     base['电话'] = list(div_col[1].find_all('span'))[1].get_text(strip=True)
 
     base['邮箱'] = list(div_col[2].find_all('span'))[1].get_text(strip=True)
 
     div_col = list(div_row[1].find_all('div'))
+
     web = div_col[0].find('a')
     base['网址'] = web.get_text(strip=True) if web else ''
+
     base['地址'] = list(div_col[1].find_all('span'))[1].get_text(strip=True)
+
 
     # div_row = list(div.find_all('div', class_='sec-c2', recursive=False))  # 有些没有简介
     # div_col = list(div_row[0].find_all('span'))
@@ -206,7 +212,7 @@ def get_base(soup):
     tb = div.find('table', class_='companyInfo-table').tbody
     tds = list(tb.find_all('td'))
     a = tds[0].find('a', title=True)
-    base['法人'] = a.get_text(strip=True)
+    base['法人'] = a.get_text(strip=True) if a else ''
     div_col = tds[1].find_all('div', class_='baseinfo-module-content-value')
     base['注册资本'] = div_col[0].get_text(strip=True)
     base['注册时间'] = div_col[1].get_text(strip=True)
@@ -229,7 +235,29 @@ def get_base(soup):
     base[tdList[19]] = tdList[20]
     base[tdList[21]] = tdList[22]
     base[tdList[23]] = re_h.sub('', str(tdList[24]))  # 去掉HTML 标签
-
+    """
+    base['名称'] = '中国电力国际发展有限公司'
+    base['电话'] = ''
+    base['邮箱'] = ''
+    base['网址'] = ''
+    base['地址'] = ''
+    base['法人'] = ''
+    base['注册资本'] = ''
+    base['注册时间'] = '2004-03-24'
+    base['企业状态'] = '仍注册'
+    base['工商注册号'] = ''
+    base['组织机构代码'] = ''
+    base['统一信用代码'] = ''
+    base['公司类型'] = '公众股份有限公司'
+    base['纳税人识别号'] = ''
+    base['行业'] = ''
+    base['营业期限'] = ''
+    base['核准日期'] = ''
+    base['登记机关'] = ''
+    base['英文名称'] = 'CHINA POWER INTERNATIONAL DEVELOPMENT LIMITED'
+    base['注册地址'] = ''
+    base['经营范围'] = ''
+    """
     return base
 
 
@@ -362,7 +390,9 @@ TYC_DATALIST = [
     # 企业背景
     DataInfo('主要人员', 'staff', pgf=pfg_staff),
     DataInfo('股东信息', 'holder', cdfdict={'股东': 'a', '认缴出资': 'span'}, coldict={0: '股东'}),
-    DataInfo('对外投资', 'invest', cdfdict={'被投资企业名称': 'span', '被投资法定代表人': 'a'}),
+    DataInfo('对外投资', 'invest', cdfdict={'被投资企业名称': cdf_invest, '被投资法定代表人': 'a'}),
+    #DataInfo('对外投资', 'invest', cdfdict={'被投资企业名称': 'span', '被投资法定代表人': 'a'}),
+
     DataInfo('变更记录', 'changeinfo'),
     DataInfo_Report,  # 企业年报
     DataInfo('分支机构', 'branch'),
@@ -377,14 +407,14 @@ TYC_DATALIST = [
     # 司法风险
     DataInfo('法律诉讼', 'lawsuit'),
     DataInfo('法院公告', 'court', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
-    DataInfo('失信人', 'shixinren', cdfdict={'详情': cdf_more}, coldict={-1: '详情'},
-            headdict={'tyc-event-ch': 'CompangyDetail.shixinren'}),
+    #DataInfo('失信人', 'shixinren', cdfdict={'详情': cdf_more}, coldict={-1: '详情'},
+    #         headdict={'tyc-event-ch': 'CompangyDetail.shixinren'}),
     DataInfo('被执行人', 'zhixing'),
     # 开庭公告缺
 
     # 经营风险
     DataInfo('经营异常', 'abnormal'),
-    DataInfo('行政处罚', 'punish', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
+    #DataInfo('行政处罚', 'punish', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
     # 严重违法缺
     DataInfo('股权出质', 'equity', cdfdict={'操作': cdf_more}, coldict={-1: '操作'}),
     DataInfo('动产抵押', 'mortgage', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
@@ -398,14 +428,14 @@ TYC_DATALIST = [
     DataInfo('招聘信息', 'recruit', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
     DataInfo('税务评级', 'taxcredit'),
     DataInfo('抽查检查', 'check'),
-    DataInfo('产品信息', 'product', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
+    #DataInfo('产品信息', 'product', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
     # 进出口信用缺
     # 资质证书缺
     # 微信公众号缺
 
     # 知识产权
     DataInfo('商标信息', 'tmInfo', coldict={'商标': ''}),
-    DataInfo('专利信息', 'patent', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
+    DataInfo('专利信息', 'patent'),
     DataInfo('著作权', 'copyright', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
     DataInfo('网站备案', 'icp')
 ]
@@ -558,6 +588,7 @@ class TYC2:
             if ti.key == 'report':
                 data = self.get_report(soup.find('div', ti.headdict))
             else:
+                print(ti.key)
                 data = self.get_data(soup, ti)
             if data and len(data):
                 comyany[ti.name] = data
@@ -597,11 +628,15 @@ def save_company(no, name, fn):
                 with _LOCK:
                     _DONE.value += 1
                     logger.info('{} {} OK '.format(no, d_key))
+        #成功爬取，ISGET设为1
+        mysql_mark(name, 1)
+
     except Exception as e:
         with _LOCK:
             _FAIL.value += 1
         logger.error('{} {} FAIL {}'.format(no, name, e))
-
+        #爬取失败，ISGET设为2
+        mysql_mark(name, 2)
 
 def main(fn, startrow, namecol, pathcol=None, sheetindex=0, poolsize=10):
     if not os.path.exists(fn):
@@ -655,23 +690,88 @@ def main(fn, startrow, namecol, pathcol=None, sheetindex=0, poolsize=10):
     with _LOCK:
         logger.info('done:{} fail:{} '.format(_DONE.value, _FAIL.value))
 
+#对外投资企业爬取
+def openFile(filepath1):
+    result_list = []
+    filepath = filepath1 + '对外投资.json'
+    if os.path.getsize(filepath):
+        with open(filepath, 'r', encoding='utf8') as load_f:
+            load_dict = json.load(load_f)
+            for i in range(len(load_dict)):
+                result_list.append(load_dict[i]['被投资公司名称'])
+    list = traversalDir_FirstDir(filepath1)
+    for tmp in list:
+        result_list.remove(tmp)
+    return result_list
+
+
+#定义一个函数，path为你的路径
+def traversalDir_FirstDir(path):
+    #定义一个列表，用来存储结果
+    list = []
+    #判断路径是否存在
+    if (os.path.exists(path)):
+        #获取该目录下的所有文件或文件夹目录
+        files = os.listdir(path)
+        for file in files:
+            #得到该文件下所有目录的路径
+            m = os.path.join(path,file)
+            #判断该路径下是否是文件夹
+            if (os.path.isdir(m)):
+                h = os.path.split(m)
+                # print(h[1])
+                list.append(h[1])
+        return list
+
+#查询未爬取的企业
+def mysql_search_companys():
+    conn = pymysql.connect(
+        host='192.168.16.231',
+        port=3306,
+        user='bigdata',
+        passwd='bigdata',
+        db='bigdata',
+        charset='utf8',
+        cursorclass=pymysql.cursors.DictCursor
+    )
+    cur = conn.cursor()
+    sql = "SELECT NSRMC FROM dj_nsrxx  where char_length(NSRMC) >= 4 AND ISGET is null LIMIT 500 ;"
+    cur.execute(sql)
+    search_list = []
+    for r in cur:
+        search_list.append(r['NSRMC'])
+    conn.commit()
+    conn.close()
+    return search_list
+
+#将爬取的企业打标
+def mysql_mark(NSRMC, ISGET):
+    conn = pymysql.connect(
+        host='192.168.16.231',
+        port=3306,
+        user='bigdata',
+        passwd='bigdata',
+        db='bigdata',
+        charset='utf8',
+        cursorclass=pymysql.cursors.DictCursor
+    )
+    cur = conn.cursor()
+    sql = "UPDATE dj_nsrxx SET ISGET = {} where NSRMC = '{}'".format(ISGET, NSRMC)
+    cur.execute(sql)
+    cur.close()
+    conn.commit()
+    conn.close()
 
 if __name__ == '__main__':
     # main('e:/tyc2/17户集团成员名单汇总.xls', 2, 1, 5, 1)
     # main('d:/用户目录/我的文档/税软/2017/产品/大数据/厦门/总局“523”专案-厦门涉案企业名单.xlsx'
     #      , 3, 2, poolsize=1)
-    # 厦门市美亚柏科信息股份有限公司 31333007
-    # 北京百度网讯科技有限公司 22822
 
-    # 中交投资有限公司  7.1亿元，110102710934721
-    # 中国化工橡胶有限公司  7.3亿元110102100008069
-    # 国家电力投资集体公司  6.6亿元，911100007109310534
-    # 海澜集团有限公司    913202811422746807
-    # 江苏新长江国际贸易有限公司 (特殊 江苏新长江实业集团有限公司）clear
-    # 深圳市中航永邦并购基金企业（有限合伙）(特殊 江苏阳光集团有限公司) clear
-    companys = ['北京华赛大有投资基金（有限合伙）']
+    #companys = openFile('f:/tyc/表2/中信信托有限责任公司/')
+    #companys = ['西南铝业（集团）有限责任公司']
+    companys = mysql_search_companys()
     for n in companys:
-    #    save_company('', n, 'e:/tyc2/北京西城区/' + n + '.json')
+        # save_company('', n, 'e:/tyc2/北京西城区/' + n + '.json')
         save_company('', n, 'f:/tyc/' + n + '/')
         time.sleep(10)
 

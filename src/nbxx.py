@@ -22,7 +22,7 @@ def openFile(filepath):
                             load_dict[i]['股东及出资信息'][a]['年份'] = re.findall(r'\d+', load_dict[i]['年度'])[0]
                             load_dict[i]['股东及出资信息'][a]['企业名称'] = load_dict[i]['企业基本信息']['企业名称']
                             load_dict[i]['股东及出资信息'][a]['统一社会信用代码'] = load_dict[i]['企业基本信息']['统一社会信用代码']
-                            load_dict[i]['股东及出资信息'][a]['登记序号'] = '江苏八家'
+                            load_dict[i]['股东及出资信息'][a]['登记序号'] = '联通集团'
                             # print(load_dict[i]['股东及出资信息'][a])
                             td_list2 = []
                             if(load_dict[i]['股东及出资信息'][a]['认缴出资额(万元)']==None):
@@ -61,7 +61,7 @@ def eachFilePath(root):
                 print(str)
                 print("###########")
                 openFile(str)
-                # openFile1(str)
+                openFile1(str)
 
 
 def openFile1(filepath):
@@ -76,7 +76,7 @@ def openFile1(filepath):
                             load_dict[i]['对外投资信息'][a]['年份'] = re.findall(r'\d+', load_dict[i]['年度'])[0]
                             load_dict[i]['对外投资信息'][a]['企业名称'] = load_dict[i]['企业基本信息']['企业名称']
                             load_dict[i]['对外投资信息'][a]['统一社会信用代码'] = load_dict[i]['企业基本信息']['统一社会信用代码']
-                            load_dict[i]['对外投资信息'][a]['登记序号'] = '江苏八家'
+                            load_dict[i]['对外投资信息'][a]['登记序号'] = '联通集团'
                             # print(load_dict[i]['对外投资信息'][a])
                             td_list2 = []
                             td_list2.append(load_dict[i]['对外投资信息'][a]['统一社会信用代码/统一信用代码'])
@@ -94,8 +94,21 @@ def openFile1(filepath):
                             conn.commit()
                             conn.close()
 
+def countFilePath(root):
+    count = 0
+    for dirpath, dirnames, filenames in os.walk(root):
+        for filepath in filenames:
+            # print(os.path.join(dirpath, filepath))
+            str = os.path.join(dirpath, filepath)
+            if(str.endswith('企业年报.json')):
+                count += 1
+    return count
+
+
 if __name__ == '__main__':
     # filePath = "E:\\tyc2\\北京西城区\\8家集团信息（包括子公司和子公司下一级）\\法尔胜泓昇集团有限公司\\企业年报.json"
-    root = "E:\\tyc2\\北京西城区\\8家集团信息（包括子公司和子公司下一级）"
+    root = "E:\\联通集团"
     # openFile(filePath)
     eachFilePath(root)
+    #count = countFilePath('f:/tyc/表2')
+    #print(count)

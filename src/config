@@ -1,0 +1,10 @@
+{
+    "dev":{
+        "host":"192.168.16.231",
+        "port":3306,
+        "user":"bigdata",
+        "password":"bigdata",
+        "database":"bigdata",
+        "charset":"utf8"
+        }
+}
