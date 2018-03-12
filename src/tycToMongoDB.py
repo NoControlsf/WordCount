@@ -9,7 +9,7 @@ import multiprocessing.dummy as mt
 import os
 import re
 import time
-
+from pymongo import MongoClient
 import pymysql
 import requests
 
@@ -154,7 +154,7 @@ def cdf_more(element):
     # print(span.get_text())
     return json.loads(span.get_text())
 
-    
+
 # 字段分析 ColumnDefineFunction 对外投资企业的年报信息
 def cdf_invest(element):
     a = element.find('a')
@@ -434,8 +434,8 @@ TYC_DATALIST = [
     # 微信公众号缺
 
     # 知识产权
-    DataInfo('商标信息', 'tmInfo', coldict={'商标': ''}),
-    DataInfo('专利信息', 'patent'),
+    #DataInfo('商标信息', 'tmInfo', coldict={'商标': ''}),
+    #DataInfo('专利信息', 'patent'),
     DataInfo('著作权', 'copyright', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
     DataInfo('网站备案', 'icp')
 ]
@@ -614,31 +614,23 @@ class TYC2:
 def save_company(no, name, fn):
     try:
         c = TYC2(name).get_company()
-        jList = ['id', '基本信息', '主要人员', '股东信息', '对外投资', '变更记录', '企业年报', '分支机构', '融资历史',
-                 '核心团队', '企业业务', '投资事件', '法律诉讼', '法院公告', '失信人', '被执行人', '经营异常', '行政处罚',
-                 '股权出质', '动产抵押', '欠税公告', '招投标', '债券信息', '购地信息', '招聘信息', '税务评级', '抽查检查',
-                 '产品信息', '商标信息', '专利信息', '著作权', '网站备案']
-        for j_key in jList:
-            jpath = fn + j_key + '.json '
-            util.fileutil.check_filepath(jpath)
-            os.system("cd.>"+jpath)
-        for d_key in c.keys():
-            if c[d_key]:
-                tpath = fn + d_key + '.json'
-                util.fileutil.check_filepath(tpath)
-                with open(tpath, mode='wt', encoding='utf-8') as f:
-                    json.dump(c[d_key], f, ensure_ascii=False, indent='\t')
-                with _LOCK:
-                    _DONE.value += 1
-                    logger.info('{} {} OK '.format(no, d_key))
+
+        conn = MongoClient('localhost', 27017)
+        db = conn.tycdb  # 连接tycdb数据库，没有则自动创建
+        my_set = db.beijing_ningxia  # 使用test_set集合，没有则自动创建
+        my_set.insert(c)
+        print('ok')
+        #print(c['id'])
         #成功爬取，ISGET设为1
-        #mysql_mark(name, 1)
+        mysql_mark(name, 1)
+        #成功爬取，添加companyid
+        mysql_setid(name, c['id'])
     except Exception as e:
         with _LOCK:
             _FAIL.value += 1
         logger.error('{} {} FAIL {}'.format(no, name, e))
         #爬取失败，ISGET设为2
-        #mysql_mark(name, 2)
+        mysql_mark(name, 2)
 
 def main(fn, startrow, namecol, pathcol=None, sheetindex=0, poolsize=10):
     if not os.path.exists(fn):
@@ -717,7 +709,7 @@ def traversalDir_FirstDir(path):
         files = os.listdir(path)
         for file in files:
             #得到该文件下所有目录的路径
-            m = os.path.join(path,file)
+            m = os.path.join(path, file)
             #判断该路径下是否是文件夹
             if (os.path.isdir(m)):
                 h = os.path.split(m)
@@ -764,14 +756,32 @@ def mysql_mark(NSRMC, ISGET):
     conn.commit()
     conn.close()
 
+#将爬到的企业添加公司id
+def mysql_setid(NSRMC, companyid):
+    conn = pymysql.connect(
+        host='192.168.16.231',
+        port=3306,
+        user='bigdata',
+        passwd='bigdata',
+        db='bigdata',
+        charset='utf8',
+        cursorclass=pymysql.cursors.DictCursor
+    )
+    cur = conn.cursor()
+    sql = "UPDATE dj_nsrxx SET companyid = '{}' where NSRMC = '{}'".format(companyid, NSRMC)
+    cur.execute(sql)
+    cur.close()
+    conn.commit()
+    conn.close()
+
 if __name__ == '__main__':
     # main('e:/tyc2/17户集团成员名单汇总.xls', 2, 1, 5, 1)
     # main('d:/用户目录/我的文档/税软/2017/产品/大数据/厦门/总局“523”专案-厦门涉案企业名单.xlsx'
     #      , 3, 2, poolsize=1)
 
     #companys = openFile('f:/tyc/表2/中信信托有限责任公司/')
-    companys = ['上海顶昂信息科技有限公司']
-    #companys = mysql_search_companys()
+    #companys = ['北大方正集团有限公司']
+    companys = mysql_search_companys()
     for n in companys:
         # save_company('', n, 'e:/tyc2/北京西城区/' + n + '.json')
         save_company('', n, 'f:/tyc/' + n + '/')
