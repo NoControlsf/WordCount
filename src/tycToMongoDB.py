@@ -50,7 +50,7 @@ logger = src.util.loginit.get_logger('tyc2')
 
 def get_login():
     url = 'https://www.tianyancha.com/cd/login.json'
-    """
+
     login_json = {'mobile': '13606181270',
                   'cdpassword': 'de2acaac3f5037d6acfba46454cbca87',
                   'loginway': 'PL',
@@ -60,7 +60,7 @@ def get_login():
                   'cdpassword': '8dd8734a6c52f4303dd36cc61e11b6fc',
                   'loginway': 'PL',
                   'autoLogin': True}
-
+    """
 
     resp = SESS.post(url, json=login_json)
     logger.info('get login')
@@ -194,14 +194,14 @@ def get_base(soup):
 
     base['电话'] = list(div_col[1].find_all('span'))[1].get_text(strip=True)
 
-    base['邮箱'] = list(div_col[2].find_all('span'))[1].get_text(strip=True)
+    base['邮箱'] = list(div_col[1].find_all('span'))[4].get_text(strip=True)
 
     div_col = list(div_row[1].find_all('div'))
 
-    web = div_col[0].find('a')
+    web = div_row[1].find('a')
     base['网址'] = web.get_text(strip=True) if web else ''
 
-    base['地址'] = list(div_col[1].find_all('span'))[1].get_text(strip=True)
+    base['地址'] = list(div_col[4].find_all('span'))[3].get_text(strip=True)
 
 
     # div_row = list(div.find_all('div', class_='sec-c2', recursive=False))  # 有些没有简介

@@ -182,27 +182,29 @@ def wtb_announcement(element):
 
 
 def get_base(soup):
+    # print(soup)
     base = {}
 
     div = soup.find('div', class_='company_header_width')
-
+    # print(div)
     base['名称'] = div.div.span.get_text(strip=True)
 
     div_row = list(div.find_all('div', recursive=False))
-
+    # print(div_row)
     div_col = list(div_row[1].find_all('div'))
-
+    #print(div_col[4].find_all('span'))
     base['电话'] = list(div_col[1].find_all('span'))[1].get_text(strip=True)
 
-    base['邮箱'] = list(div_col[2].find_all('span'))[1].get_text(strip=True)
+    base['邮箱'] = list(div_col[1].find_all('span'))[4].get_text(strip=True)
 
     div_col = list(div_row[1].find_all('div'))
 
-    web = div_col[0].find('a')
+    web = div_row[1].find('a')
+    # print(web)
     base['网址'] = web.get_text(strip=True) if web else ''
 
-    base['地址'] = list(div_col[1].find_all('span'))[1].get_text(strip=True)
-
+    base['地址'] = list(div_col[4].find_all('span'))[3].get_text(strip=True)
+    #print(base)
 
     # div_row = list(div.find_all('div', class_='sec-c2', recursive=False))  # 有些没有简介
     # div_col = list(div_row[0].find_all('span'))
@@ -614,6 +616,7 @@ class TYC2:
 def save_company(no, name, fn):
     try:
         c = TYC2(name).get_company()
+        #分开
         jList = ['id', '基本信息', '主要人员', '股东信息', '对外投资', '变更记录', '企业年报', '分支机构', '融资历史',
                  '核心团队', '企业业务', '投资事件', '法律诉讼', '法院公告', '失信人', '被执行人', '经营异常', '行政处罚',
                  '股权出质', '动产抵押', '欠税公告', '招投标', '债券信息', '购地信息', '招聘信息', '税务评级', '抽查检查',
@@ -631,14 +634,22 @@ def save_company(no, name, fn):
                 with _LOCK:
                     _DONE.value += 1
                     logger.info('{} {} OK '.format(no, d_key))
+        #整个json
+        if c:
+            util.fileutil.check_filepath(fn)
+            with open(fn, mode='wt', encoding='utf-8') as f:
+                json.dump(c, f, ensure_ascii=False, indent='\t')
+            with _LOCK:
+                _DONE.value += 1
+                logger.info('{} {} OK '.format(no, name))
         #成功爬取，ISGET设为1
-        #mysql_mark(name, 1)
+        mysql_mark(name, 1)
     except Exception as e:
         with _LOCK:
             _FAIL.value += 1
         logger.error('{} {} FAIL {}'.format(no, name, e))
         #爬取失败，ISGET设为2
-        #mysql_mark(name, 2)
+        mysql_mark(name, 2)
 
 def main(fn, startrow, namecol, pathcol=None, sheetindex=0, poolsize=10):
     if not os.path.exists(fn):
@@ -737,7 +748,10 @@ def mysql_search_companys():
         cursorclass=pymysql.cursors.DictCursor
     )
     cur = conn.cursor()
-    sql = "SELECT NSRMC FROM dj_nsrxx  where char_length(NSRMC) >= 4 AND ISGET is null LIMIT 500 ;"
+    #北京宁夏查询未爬取企业sql
+    #sql = "SELECT NSRMC FROM dj_nsrxx  where char_length(NSRMC) >= 4 AND ISGET is null LIMIT 500 ;"
+    #上市公司查询未爬取企业sql
+    sql = "SELECT full_name FROM company_profile  where isget is null LIMIT 500 ;"
     cur.execute(sql)
     search_list = []
     for r in cur:
@@ -758,7 +772,10 @@ def mysql_mark(NSRMC, ISGET):
         cursorclass=pymysql.cursors.DictCursor
     )
     cur = conn.cursor()
-    sql = "UPDATE dj_nsrxx SET ISGET = {} where NSRMC = '{}'".format(ISGET, NSRMC)
+    #北京宁夏更新状态sql
+    #sql = "UPDATE dj_nsrxx SET ISGET = {} where NSRMC = '{}'".format(ISGET, NSRMC)
+    #上市公司更新状态sql
+    sql = "UPDATE company_profile SET isget = {} where full_name = '{}'".format(ISGET, NSRMC)
     cur.execute(sql)
     cur.close()
     conn.commit()
@@ -770,8 +787,8 @@ if __name__ == '__main__':
     #      , 3, 2, poolsize=1)
 
     #companys = openFile('f:/tyc/表2/中信信托有限责任公司/')
-    companys = ['上海顶昂信息科技有限公司']
-    #companys = mysql_search_companys()
+    #companys = ['上海顶昂信息科技有限公司']
+    companys = mysql_search_companys()
     for n in companys:
         # save_company('', n, 'e:/tyc2/北京西城区/' + n + '.json')
         save_company('', n, 'f:/tyc/' + n + '/')
