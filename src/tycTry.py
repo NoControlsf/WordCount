@@ -50,7 +50,7 @@ logger = src.util.loginit.get_logger('tyc2')
 
 def get_login():
     url = 'https://www.tianyancha.com/cd/login.json'
-    """
+
     login_json = {'mobile': '13606181270',
                   'cdpassword': 'de2acaac3f5037d6acfba46454cbca87',
                   'loginway': 'PL',
@@ -60,7 +60,7 @@ def get_login():
                   'cdpassword': '8dd8734a6c52f4303dd36cc61e11b6fc',
                   'loginway': 'PL',
                   'autoLogin': True}
-
+    """
 
     resp = SESS.post(url, json=login_json)
     logger.info('get login')
@@ -182,7 +182,7 @@ def wtb_announcement(element):
 
 
 def get_base(soup):
-    # print(soup)
+    #print(soup)
     base = {}
 
     div = soup.find('div', class_='company_header_width')
@@ -193,17 +193,24 @@ def get_base(soup):
     # print(div_row)
     div_col = list(div_row[1].find_all('div'))
     #print(div_col[4].find_all('span'))
-    base['电话'] = list(div_col[1].find_all('span'))[1].get_text(strip=True)
-
-    base['邮箱'] = list(div_col[1].find_all('span'))[4].get_text(strip=True)
+    try:
+        base['电话'] = list(div_col[1].find_all('span'))[1].get_text(strip=True)
+    except Exception:
+        base['电话'] = ''
+    try:
+        base['邮箱'] = list(div_col[1].find_all('span'))[4].get_text(strip=True)
+    except Exception:
+        base['邮箱'] = ''
 
     div_col = list(div_row[1].find_all('div'))
 
     web = div_row[1].find('a')
-    # print(web)
+    #print(web)
     base['网址'] = web.get_text(strip=True) if web else ''
-
-    base['地址'] = list(div_col[4].find_all('span'))[3].get_text(strip=True)
+    try:
+        base['地址'] = list(div_col[4].find_all('span'))[2].get_text(strip=True)
+    except Exception:
+        base['地址'] = ''
     #print(base)
 
     # div_row = list(div.find_all('div', class_='sec-c2', recursive=False))  # 有些没有简介
@@ -407,7 +414,7 @@ TYC_DATALIST = [
     # 竞品信息缺
 
     # 司法风险
-    DataInfo('法律诉讼', 'lawsuit'),
+    #DataInfo('法律诉讼', 'lawsuit'),
     DataInfo('法院公告', 'court', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
     #DataInfo('失信人', 'shixinren', cdfdict={'详情': cdf_more}, coldict={-1: '详情'},
     #         headdict={'tyc-event-ch': 'CompangyDetail.shixinren'}),
@@ -436,7 +443,7 @@ TYC_DATALIST = [
     # 微信公众号缺
 
     # 知识产权
-    DataInfo('商标信息', 'tmInfo', coldict={'商标': ''}),
+    #DataInfo('商标信息', 'tmInfo', coldict={'商标': ''}),
     DataInfo('专利信息', 'patent'),
     DataInfo('著作权', 'copyright', cdfdict={'详情': cdf_more}, coldict={-1: '详情'}),
     DataInfo('网站备案', 'icp')
@@ -606,28 +613,40 @@ class TYC2:
         soup = self.get_soup(url, {'key': cname})
         div_list = soup.find('div', class_='search_result_container')
         if div_list:
+            div = div_list.find_all('div', class_='search_result_single')[0]
+            #print(div)
+            a = div.find('a', {'tyc-event-ch': 'CompanySearch.Company'})
+            #if a and cname == a.get_text(strip=True):
+            cid = a['href'].split('/')[-1]
+            #print(cid)
+            return cid
+            """
             for div in div_list.find_all('div', class_='search_result_single'):
                 a = div.find('a', {'tyc-event-ch': 'CompanySearch.Company'})
                 if a and cname == a.get_text(strip=True):
                     cid = a['href'].split('/')[-1]
                     return cid
-
+            """
 
 def save_company(no, name, fn):
     try:
         c = TYC2(name).get_company()
+        print(c)
         #分开
         jList = ['id', '基本信息', '主要人员', '股东信息', '对外投资', '变更记录', '企业年报', '分支机构', '融资历史',
                  '核心团队', '企业业务', '投资事件', '法律诉讼', '法院公告', '失信人', '被执行人', '经营异常', '行政处罚',
                  '股权出质', '动产抵押', '欠税公告', '招投标', '债券信息', '购地信息', '招聘信息', '税务评级', '抽查检查',
                  '产品信息', '商标信息', '专利信息', '著作权', '网站备案']
+        """
         for j_key in jList:
             jpath = fn + j_key + '.json '
-            util.fileutil.check_filepath(jpath)
-            os.system("cd.>"+jpath)
+            #util.fileutil.check_filepath(jpath)
+            fp = open(jpath, mode='wt', encoding='utf-8')
+            fp.close()
+        """
         for d_key in c.keys():
             if c[d_key]:
-                tpath = fn + d_key + '.json'
+                tpath = fn.replace(' ', '') + d_key + '.json'
                 util.fileutil.check_filepath(tpath)
                 with open(tpath, mode='wt', encoding='utf-8') as f:
                     json.dump(c[d_key], f, ensure_ascii=False, indent='\t')
@@ -636,8 +655,10 @@ def save_company(no, name, fn):
                     logger.info('{} {} OK '.format(no, d_key))
         #整个json
         if c:
-            util.fileutil.check_filepath(fn)
-            with open(fn, mode='wt', encoding='utf-8') as f:
+            #util.fileutil.check_filepath(fn.replace(' ', ''))
+            bpath = fn.replace(' ', '')[:-1] + '.json'
+
+            with open(bpath, mode='wt', encoding='utf-8') as f:
                 json.dump(c, f, ensure_ascii=False, indent='\t')
             with _LOCK:
                 _DONE.value += 1
@@ -755,7 +776,8 @@ def mysql_search_companys():
     cur.execute(sql)
     search_list = []
     for r in cur:
-        search_list.append(r['NSRMC'])
+        #search_list.append(r['NSRMC'])
+        search_list.append(r['full_name'])
     conn.commit()
     conn.close()
     return search_list
@@ -791,7 +813,7 @@ if __name__ == '__main__':
     companys = mysql_search_companys()
     for n in companys:
         # save_company('', n, 'e:/tyc2/北京西城区/' + n + '.json')
-        save_company('', n, 'f:/tyc/' + n + '/')
+        save_company('', n, 'f:/tyc/shangshi/' + n + '/')
         time.sleep(10)
 
 
