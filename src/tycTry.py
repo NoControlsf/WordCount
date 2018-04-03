@@ -506,7 +506,7 @@ class TYC2:
         soup = self.get_soup(TYC_HOST + href)
         # print(soup)
         div_body = soup.find('div', class_='report_body')
-        div_content = list(div_body.find_all('div', recursive=False))[1]
+        div_content = list(div_body.find_all('div', recursive=False))[0]
         for div in list(div_content.find_all('div', class_=True)):
             title = div.find('div', class_='report_title')
             tb = div.find('table', class_='table')
