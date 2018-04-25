@@ -186,8 +186,9 @@ def get_base(soup):
     base = {}
 
     div = soup.find('div', class_='company_header_width')
-    # print(div)
-    base['名称'] = div.div.span.get_text(strip=True)
+    print(div)
+    #base['名称'] = div.div.span.get_text(strip=True)
+    base['名称'] = div.find('h1').get_text(strip=True)
 
     div_row = list(div.find_all('div', recursive=False))
     # print(div_row)
@@ -198,7 +199,7 @@ def get_base(soup):
     except Exception:
         base['电话'] = ''
     try:
-        base['邮箱'] = list(div_col[1].find_all('span'))[4].get_text(strip=True)
+        base['邮箱'] = list(div_col[1].find_all('span'))[5].get_text(strip=True)
     except Exception:
         base['邮箱'] = ''
 
@@ -637,13 +638,13 @@ def save_company(no, name, fn):
                  '核心团队', '企业业务', '投资事件', '法律诉讼', '法院公告', '失信人', '被执行人', '经营异常', '行政处罚',
                  '股权出质', '动产抵押', '欠税公告', '招投标', '债券信息', '购地信息', '招聘信息', '税务评级', '抽查检查',
                  '产品信息', '商标信息', '专利信息', '著作权', '网站备案']
-        """
+        #创建空文件
         for j_key in jList:
-            jpath = fn + j_key + '.json '
-            #util.fileutil.check_filepath(jpath)
+            jpath = fn.replace(' ', '') + j_key + '.json '
+            util.fileutil.check_filepath(fn.replace(' ', ''))
             fp = open(jpath, mode='wt', encoding='utf-8')
             fp.close()
-        """
+        #写入模块数据
         for d_key in c.keys():
             if c[d_key]:
                 tpath = fn.replace(' ', '') + d_key + '.json'
@@ -653,6 +654,7 @@ def save_company(no, name, fn):
                 with _LOCK:
                     _DONE.value += 1
                     logger.info('{} {} OK '.format(no, d_key))
+        '''
         #整个json
         if c:
             #util.fileutil.check_filepath(fn.replace(' ', ''))
@@ -663,14 +665,15 @@ def save_company(no, name, fn):
             with _LOCK:
                 _DONE.value += 1
                 logger.info('{} {} OK '.format(no, name))
+        '''
         #成功爬取，ISGET设为1
-        mysql_mark(name, 1)
+        #mysql_mark(name, 1)
     except Exception as e:
         with _LOCK:
             _FAIL.value += 1
         logger.error('{} {} FAIL {}'.format(no, name, e))
         #爬取失败，ISGET设为2
-        mysql_mark(name, 2)
+        #mysql_mark(name, 2)
 
 def main(fn, startrow, namecol, pathcol=None, sheetindex=0, poolsize=10):
     if not os.path.exists(fn):
@@ -772,12 +775,13 @@ def mysql_search_companys():
     #北京宁夏查询未爬取企业sql
     #sql = "SELECT NSRMC FROM dj_nsrxx  where char_length(NSRMC) >= 4 AND ISGET is null LIMIT 500 ;"
     #上市公司查询未爬取企业sql
-    sql = "SELECT full_name FROM company_profile  where isget is null LIMIT 500 ;"
+    #新三板sql
+    sql = "SELECT company_name FROM xinsanban_company  where isget is null LIMIT 500 ;"
     cur.execute(sql)
     search_list = []
     for r in cur:
         #search_list.append(r['NSRMC'])
-        search_list.append(r['full_name'])
+        search_list.append(r['company_name'])
     conn.commit()
     conn.close()
     return search_list
@@ -797,7 +801,7 @@ def mysql_mark(NSRMC, ISGET):
     #北京宁夏更新状态sql
     #sql = "UPDATE dj_nsrxx SET ISGET = {} where NSRMC = '{}'".format(ISGET, NSRMC)
     #上市公司更新状态sql
-    sql = "UPDATE company_profile SET isget = {} where full_name = '{}'".format(ISGET, NSRMC)
+    sql = "UPDATE xinsanban_company SET isget = {} where company_name = '{}'".format(ISGET, NSRMC)
     cur.execute(sql)
     cur.close()
     conn.commit()
@@ -808,12 +812,18 @@ if __name__ == '__main__':
     # main('d:/用户目录/我的文档/税软/2017/产品/大数据/厦门/总局“523”专案-厦门涉案企业名单.xlsx'
     #      , 3, 2, poolsize=1)
 
-    #companys = openFile('f:/tyc/表2/中信信托有限责任公司/')
-    #companys = ['上海顶昂信息科技有限公司']
-    companys = mysql_search_companys()
+    companys = openFile('f:/tyc/yanshan/德诚恒业投资有限公司/')
+    """
+    companys = ['国都证券股份有限公司', '华体集团有限公司', '北京安控投资有限公司', '中国核工业建设集团公司', '中拓时代投资有限公司', '中润经济发展有限责任公司',
+                '北京恒达天润企业管理咨询有限公司', '中钢投资有限公司', '马力创业投资有限公司',
+                '北京健坤投资集团有限公司', '北京三吉利能源股份有限公司', '北京绵世方达投资有限责任公司',
+                '北京和兆玖盛投资有限公司', '蒙包商汇投资管理有限公司',
+                '北京君盈国际投资有限责任公司', '北京德和投资有限公司', '北京远通鑫海商贸有限公司', '德诚恒业投资有限公司']
+    """
+    #companys = mysql_search_companys()
     for n in companys:
         # save_company('', n, 'e:/tyc2/北京西城区/' + n + '.json')
-        save_company('', n, 'f:/tyc/shangshi/' + n + '/')
-        time.sleep(10)
+        save_company('', n, 'f:/tyc/yanshan/德诚恒业投资有限公司/' + n + '/')
+        time.sleep(5)
 
 
