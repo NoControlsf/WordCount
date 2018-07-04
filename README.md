@@ -1,0 +1,80 @@
+# WordCount
+该项目是我个人写的一个爬虫的集合。本次将对该项目做一次整理。
+（鉴于个人工作原因，目前不再更新这个项目，对该项目有兴趣的朋友可私聊我，我会帮助解答问题。）
+WordCount
+--sql    //建表语句
+  --3bstock.sql    //股票股权相关（sqlite3）
+  --cnstock.sql    //国内上市公司股权相关（sqlite3）
+  --fdcstock.sql    //北京房地产（sqlite3）
+  --hkstock.sql    //香港上市公司股权相关（sqlite3）
+  --house163.sql    //house163楼盘统计（sqlite3）
+  --jsbj.sql    //天眼查年报股东及对外投资转换表（方便kettle数据清洗 sqlite3）
+  --pjws.sql    //裁判文书（sqlite3）
+  --Shares.sql    //沪深A股、港股、美股（sqlite3 mysql）
+--src    //爬虫源代码
+  --AI    //机器学习（只研究了一点）
+    --perceptron.py    //感知器
+  --imageUtil
+    --imgTest.py    //在线读取图片
+  --IPCatch
+    --ipc.py    //抓取免费代理ip
+  --model    //python常用库集合
+    --itertools.py    //迭代器
+    --jsonTry.py    //json数据处理
+    --loggingTry.py    //日志
+    --osTry.py    //windows文件操作
+    --reTry.py    //正则表达式
+    --signaltry.py    //内部处理信号
+    --sysTry.py    //解释器相关函数
+    --threadingTry.py    //线程
+    --timeTry.py    //时间
+    --urllibTry.py    //url请求库
+  --mygame    //pygame相关
+    --ball.py    //画球运动轨迹
+    --myfpyg.py    //拖动图像
+  --shares    //股票爬虫（数据来源：新浪财经）
+    --dbTest.py    //测试读取配置文件
+    --HSShares.py    //沪深A股、港股、美股爬虫
+    --sharesDB.conf    //数据库配置文件
+  --Tools    //通用工具脚本
+    --codechange.py    //修改文件编码方式
+    --EquityPledgeUtil.py    //递归文件夹，打开指定文件
+    --Time.py    //设置时间
+  --util    //天眼查爬虫工具类
+    --codeutil.py    //企业代码验证
+    --excel.py    //写入excel工具
+    --fileutil.py    //创建空文件夹函数
+    --js.py    //javascript模拟
+    --loginit.py    //爬虫日志输出
+    --mt.py    //请求池
+    --pdfrd.py    //pdf读取
+    --test.py    //测试请求池
+    --verify.py    //天眼查校验
+    --wraps.py    //请求失败时尝试重新请求
+  --cnstockTry.py    //股权信息爬虫 （数据来源：新三板、巨潮资讯网、新浪财经）
+  --crawler.py    //文件拷贝移动读取、获取响应工具类
+  --doc2docx.py    //doc文件转docx文件工具类
+  --docxopen.py    //docx文件读取
+  --fdc.py    //房地产爬虫1：土地交易信息汇总、宗地明显信息、 土地出让信息、土地出让结果
+  --fdc2.py    //房地产爬虫2：建设项目选址意见书、建设单位项目办理详细信息、建筑名称核准、建筑名称核准详细信息
+  --fdc3.py    //未写完的爬虫
+  --FileHandle.py    //python读取文件
+  --HKDeal.py    //香港交易所最新上市公司公告爬虫：未完成
+  --house163.py    //house163网站爬虫：每日楼盘统计
+  --linkvarinsTry.py    //链接爬虫
+  --nbxx.py    //天眼查年报信息json文件清洗脚本
+  --parsedoc.py    //docx裁判文书解析入库脚本
+  --practice_three.py    //house163网站爬虫(设定时间版本)
+  --pythonTest.py    //练习python模拟网页登录
+  --RandWsql.py    //sql分批插入数据库脚本
+  --SixDegreesOfseparation.py    //六度分割理论
+  --ssgsTry.py    //上市公司股权爬虫
+  --test1.py    //random随机库
+  --Trip.py    //旅游景点爬虫：未完成
+  --tycToMongoDB.py    //天眼查数据导入mongoDB脚本
+  --tycTry.py    //天眼查爬虫
+  --wcfirst.py    //分词器使用 词云特效
+  --web_parse.py    //静态网页爬取
+  --XPath.py    //xpath解析方法
+  --zhihu.py    //知乎登录验证
+  
